@@ -150,4 +150,11 @@ class Equipment extends CI_Controller
 			$this->load->view('pages/equipments/equipments_csv', $data);
 		}
 	}
+
+	public function getEDashboardYear(){
+
+		$year = $this->equipment_model->getEDashboard();
+		
+		echo json_encode($year);
+	}
 }

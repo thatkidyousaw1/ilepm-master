@@ -96,4 +96,14 @@ class Equipment_Model extends CI_Model
 
 		return $this->db->trans_complete();
 	}
+
+	public function getEDashboard(){
+		$this->db->select('year, COUNT(year) as yearvalue');
+		$this->db->from('quantityperequipmentunit');
+		$this->db->group_by('year');
+		$this->db->order_by('year desc');
+		$query = $this->db->get();
+
+		return $query->result();
+	}
 }

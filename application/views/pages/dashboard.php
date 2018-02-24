@@ -9,28 +9,6 @@
 
 <script type="text/javascript">
 
-//   $(document).ready(function(){
-//     var acct_regs = [{"year": "2008", "value": 20}, 
-//     {"year": "2009", "value": 90}, 
-//     {"year": "2010", "value": 5},
-//     {"year": "2011", "value": 5},
-//     {"year": "2012", "value": 20},];
-
-//     new Morris.Line({
-//       // ID of the element in which to draw the chart.
-//       element: 'consumables',
-//       // Chart data records -- each entry in this array corresponds to a point on
-//       // the chart.
-//       data: acct_regs,
-//       // The name of the data record attribute that contains x-values.
-//       xkey: 'year',
-//       // A list of names of data record attributes that contain y-values.
-//       ykeys: ['value'],
-//       // Labels for the ykeys -- will be displayed when you hover over the
-//       // chart.
-//       labels: ['Value']
-//     });
-// });
      $.ajax({
             type: "GET",
             url: "Consumable/getDashBoardYear",
@@ -49,6 +27,28 @@
                 }
                 else {
                     $('#consumables').html('<div class="text-center cool-text" style="position: absolute"><h3>No entries</h3></div>');
+                }
+            },
+        });
+
+      $.ajax({
+            type: "GET",
+            url: "Equipment/getEDashBoardYear",
+            cache: false,
+            dataType: "json",
+            timeout: 30000,
+            success : function (data) {
+                if(data) {
+                    Morris.Line({
+                        element: 'equipments',
+                        data: data,
+                        xkey: 'year',
+                        ykeys: ['yearvalue'],
+                        labels: ['Value'],
+                    });
+                }
+                else {
+                    $('#equipments').html('<div class="text-center cool-text" style="position: absolute"><h3>No entries</h3></div>');
                 }
             },
         });
