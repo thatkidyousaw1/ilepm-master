@@ -31,23 +31,27 @@
 //       labels: ['Value']
 //     });
 // });
-    
-    $.getJSON("<?php base_url();?>consumables/get-dashboard-year",function (json) { 
-
-            var acctregs = new Morris.Line({
-                        // ID of the element in which to draw the chart.
-                        element: 'acctregs',
-                        // Chart data records -- each entry in this array corresponds to a point on
-                        // the chart.
-                        data: json,
-                        // The name of the data record attribute that contains x-values.
+     $.ajax({
+            type: "GET",
+            url: "Consumable/getDashBoardYear",
+            cache: false,
+            dataType: "json",
+            timeout: 30000,
+            success : function (data) {
+                if(data) {
+                    Morris.Line({
+                        element: 'consumables',
+                        data: data,
                         xkey: 'year',
-                        // A list of names of data record attributes that contain y-values.
                         ykeys: ['yearvalue'],
-                        // Labels for the ykeys -- will be displayed when you hover over the
-                        // chart.
                         labels: ['Value'],
                     });
+                }
+                else {
+                    $('#consumables').html('<div class="text-center cool-text" style="position: absolute"><h3>No entries</h3></div>');
+                }
+            },
         });
-
 </script>
+
+

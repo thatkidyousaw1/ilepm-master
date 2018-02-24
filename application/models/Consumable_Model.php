@@ -118,17 +118,10 @@ class Consumable_Model extends CI_Model
 	public function getDashboard(){
 		$this->db->select('year, COUNT(year) as yearvalue');
 		$this->db->from('quantityperconsumableunit');
-
+		$this->db->group_by('year');
+		$this->db->order_by('year desc');
 		$query = $this->db->get();
 
 		return $query->result();
-
-		// $this->db->select('year');
-		// $this->db->distinct();
-		// $this->db->from('quantityperconsumableunit');
-
-		// $query = $this->db->get();
-
-		// return $query->result();
 	}
 }
