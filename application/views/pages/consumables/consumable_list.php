@@ -1,5 +1,7 @@
 <div class="content-wrapper">
-    <h1><center> List of Consumables </center></h1>
+    <h1>
+        <center> List of Consumables </center>
+    </h1>
     <div class="row">
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -34,6 +36,11 @@
                         <div class="col-sm-4" style="margin-top: 10px">
                             <input type="button" class="btn btn-primary" name="btnYear" id="btnYear" value="Proceed">
                         </div>
+                        <div class="col-sm-1" style="margin-top: 10px; float: right">
+                            <input type="button" class="btn btn-primary" name="btnEdit1" id="btnEdit1" value="Edit">
+                        </div>
+                        <div class="dataTable_wrapper col-sm-12" id="anotherTable">
+                        </div>
                         <div class="dataTable_wrapper col-sm-12">
                             <table id="consumableTable" class="table table-striped table-bordered" width="100%" cellspacing="0">
                                 <thead>
@@ -57,7 +64,7 @@
                                         <td>'.$item->summer.'</td>
                                         <td>
                                             <div class="text-center">
-                                                <input type="checkbox" name="checkbox" onchange="toggleCheckbox(this)" value="'.$item->id.'">
+                                                <input type="checkbox" name="check_list" value="'.$item->id.'">
                                             </div>
                                         </td>
                                     </tr>
@@ -66,6 +73,9 @@
                                 ?> 
                             </tbody>
                         </table>
+                        <div class="col-sm-1" style="margin-top: 10px; float: right">
+                            <input type="button" class="btn btn-primary" name="btnEdit2" id="btnEdit2" value="Edit">
+                        </div>
                     </div>
                 </form>
             </div>
@@ -76,25 +86,39 @@
 
 
 <script type="text/javascript">
+    var editor;
     var formCreate = $("#consumableForm");
     $(document).ready(function() {
         $('#consumableTable').DataTable({
+            'dom': "<'row'<'col-sm-4'l><'col-sm-5 text-center visible-lg'B><'col-sm-3'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            'buttons': [
+            {
+                'extend': 'excel',
+                'text': '<i class="fa fa-file-excel-o fg-green"></i>&nbsp;Excel',
+                'exportOptions': {
+                    'columns': ':visible'
+                }
+            },
+            ],
             'order': [[0, 'asc']],
             "aoColumns": [
             { "sType": "num" },
-            null,
-            null,
-            null,
-            null,
-            null,
-            ],
-        });
-
+            { "render": function(data, type, row){
+                return data.split('\n').join("<br/>");
+            }
+        },
+        null,
+        null,
+        null,
+        null,
+        ],
+    });
         jQuery.validator.setDefaults({
             debug: true,
             success: "valid"
         });
-
         formCreate.validate({
             ignore: ".input-sm",
             rules: {
@@ -102,7 +126,6 @@
                     required: true
                 },
             },
-
             messages: {
                 yearone: {
                     required: "<span style='font-family: calibri'>The Year field is empty</span>"
@@ -110,12 +133,23 @@
             }
         });
     });
-
     function getTable(data){
         var newData = $(data).find('#consumableTable').html();
         $('#consumableTable').DataTable().destroy();
         $('#consumableTable').html(newData);
         $('#consumableTable').DataTable({
+            'dom': "<'row'<'col-sm-4'l><'col-sm-5 text-center visible-lg'B><'col-sm-3'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            'buttons': [
+            {
+                'extend': 'excel',
+                'text': '<i class="fa fa-file-excel-o fg-green"></i>&nbsp;Excel',
+                'exportOptions': {
+                    'columns': ':visible'
+                }
+            },
+            ],
             'order': [[0, 'asc']],
             "aoColumns": [
             { "sType": "num" },
@@ -127,7 +161,6 @@
             ],
         }).draw();
     }
-
     function getCategory(sel){
         var url = "<?php echo base_url();?>consumables/list-of-consumables"; 
         $.ajax({
@@ -139,17 +172,13 @@
         }
     });
     }
-
     function getYear(sel){
         var yearData = parseInt($('#yearone').val());
         $('#yeartwo').val(yearData + 1);
     }
-
     $('#btnYear').click(function(){
         var url = "<?php echo base_url();?>consumables/list-of-consumables-year";
-
         if(formCreate.valid() === false){
-            
         }else{
             $.ajax({
                 type: "POST",
@@ -170,7 +199,6 @@
             });
         }
     });
-
     function createTableForYear(){
         var url = "<?php echo base_url();?>consumables/list-of-consumables-year-create";
         var year = $('#yearone').val();
@@ -186,29 +214,84 @@
             }
         });
     }
-
-    function toggleCheckbox(sel){
-        var val = [];
-        $(':checkbox:checked').each(function(i){
-          val[i] = $(this).val();
-          /*$.ajax({
-            type: 'POST',
-            url: url,
-            data:{
-                'id': val[i];
-            },
-            success: function(data){
-
+    $('#btnEdit1').click(function(){
+        var url = "<?php echo base_url();?>consumables/list-edit-of-consumables";
+        if(formCreate.valid() === false){
+        }else{
+            document.getElementById("anotherTable").innerHTML = "<table id='consumableTableByCheck' class='table table-striped table-bordered' width='100%' cellspacing='0'>" +
+            "<thead>" +
+            "<tr>" + 
+            "<th>Part Number</th>" +
+            "<th>Description</th>" +
+            "<th>1st Semester</th>" +
+            "<th>2nd Semester</th>" +
+            "<th>Summer</th>" +
+            "</tr>" +
+            "</thead>"+
+            "</table>";
+            $('#consumableTableByCheck').DataTable({
+                "ajax":{
+                    url: url,
+                    type: 'POST',
+                    data: function(d){
+                        d.id = $('input[name=check_list]').val();
+                        d.year = $('#yearone').val();
+                        console.log(d.id);
+                    },
+                    select: true,
+                },
+            });
+            var editorOpts = {
+                table: "#consumableTableByCheck",
+                fields: [ {
+                    label: "Part Number:",
+                    name: "part_number"
+                }, {
+                    label: "Description:",
+                    name: "description"
+                }, {
+                    label: "1st Semester:",
+                    name: "first"
+                }, {
+                    label: "2nd Semester:",
+                    name: "second"
+                }, {
+                    label: "Summer:",
+                    name: "summer"
+                },
+                ]
+            };
+                /*editor = new $.fn.dataTable.Editor( {
+                    table: "#consumableTableByCheck",
+                    fields: [ {
+                        label: "Part Number:",
+                        name: "part_number"
+                    }, {
+                        label: "Description:",
+                        name: "description"
+                    }, {
+                        label: "1st Semester:",
+                        name: "first"
+                    }, {
+                        label: "2nd Semester:",
+                        name: "second"
+                    }, {
+                        label: "Summer:",
+                        name: "summer"
+                    },
+                    ]
+                } );*/
             }
-        });*/
-    });
-    }
-</script>
-
-
-<script src="<?php echo base_url(); ?>assets/dist/js/jquery.dataTables.min.js"></script>
-<script src="<?php echo base_url(); ?>assets/dist/js/dataTables.bootstrap.min.js"></script>
-
+        });
+    </script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/jquery.dataTables.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/dataTables.bootstrap.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/dataTables.buttons.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/dataTables.select.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/buttons.flash.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/jszip.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/vfs_fonts.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/buttons.html5.min.js"></script>
+    <script src="<?php echo base_url(); ?>assets/dist/js/buttons.print.min.js"></script>
 </body>
 </html>
-

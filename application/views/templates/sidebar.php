@@ -6,7 +6,7 @@
           <i class="fa fa-dashboard"></i>Dashboard
         </a>
       </li>
-      <li class="treeview">
+ <!--      <li class="treeview">
         <a href="#">
           <i class="fa fa-files-o"></i>
           <span>Consumables</span>
@@ -36,7 +36,7 @@
        </ul>
      </span>
    </a>
- </li>
+ </li> -->
  <li class="treeview">
   <a href="#">
     <i class="fa fa-pie-chart"></i>
